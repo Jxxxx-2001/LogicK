@@ -11,19 +11,8 @@
 
 Require Import Mappings_ML.
 Require Import Base_ML.
-Require Import Coq.Logic.Classical.
-Require Import Coq.Logic.Epsilon.
 (* Require Import Coq.micromega.Lia. *)
 (*Print epsilon_statement.*)
-
-Theorem classicT : forall (P : Prop), {P} + {~P}.
-Proof.
-  intros. assert {x : bool | if x then P else ~P}.
-  { apply constructive_indefinite_description. destruct (classic P).
-    - exists true. auto.
-    - exists false. auto. }
-  destruct H, x; auto.
-Qed.
 
 (*Inductive function_bijective {A B} (f: A -> B): Prop :=
   | fun_bij_intro : function_injective f ->

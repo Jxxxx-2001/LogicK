@@ -11,8 +11,6 @@
 
 Require Import Base_ML.
 Require Export Coq.Arith.Arith.
-Require Export Coq.Logic.Classical.
-Require Export Coq.Logic.Epsilon.
 Require Export Coq.Vectors.Vector.
 Import VectorNotations.
 
@@ -33,13 +31,9 @@ Inductive Fun : Set := F : nat -> nat -> Fun.
 Inductive Rel : Set := R : nat -> nat -> Rel.
 
 (* 变元相关性质 *)
-Definition var_num (v : Var): nat := match v with X n => n end.
-
 Definition eqbv (n m : Var) : bool := match n, m with X p, X q => p =? q end.
 
 (* 常元相关性质 *)
-Definition con_num (v : Con) : nat := match v with C n => n end.
-
 Definition eqbc (n m : Con) : bool := match n, m with C p, C q => p =? q end.
 
 (* 元数(arity)函数 *)
@@ -182,79 +176,11 @@ Fixpoint Formula_free_Ens (p: Formula) :=
   | ForAll x q => (Formula_free_Ens q) ~ [/x]
   end.
 
-(* 公式的约束变元集 *)
-Fixpoint Formula_bound_Ens (p: Formula) :=
-  match p with 
-  | equality t1 t2 => Φ_Vr
-  | atomic _ q => Φ_Vr
-  | Not q => Formula_bound_Ens q
-  | Contain m n => (Formula_bound_Ens m) ∪ (Formula_bound_Ens n)
-  | ForAll x q => (Formula_bound_Ens q) ∪ [/x]
-  end.
-
 (* 闭项: 只含个体常元的项叫做闭项 *)
 Definition closed_term (t: term) := term_Ens t = Φ_Vr.
   
 (* 语句(闭式): 不含自由变元的公式 *)
 Definition statement (p: Formula) := Formula_free_Ens p = Φ_Vr.
-
-(* 项的变元和常元组成的项子集 *)
-Fixpoint ST (t: term) : Ensemble term :=
-  match t with
-  | Tcon c => [/t]
-  | Tvar x => [/t]
-  | Tfun  _ q => let fix Vector_ST (n: nat) (r: Vector.t (term) n) :=
-                   match r with 
-                   | nil _ => (@ Empty_set term)
-                   | cons _ h _ q => (ST h) ∪ (Vector_ST _ q)
-                   end in [/t] ∪ (Vector_ST _ q)
-  end.
-Check ST.
-(* Goal forall t : term, (ST t) = (term_Ens t) ∪ (term_C_set t). *)
-
-(* 项向量的仅由变元和常元组成的子项集 *)
-Fixpoint Vector_ST (n: nat) (r: Vector.t (term) n) : Ensemble term :=
-   match r with 
-   | nil _ => (@ Empty_set term)
-   | cons _ h _ q => (ST h) ∪ (Vector_ST _ q)
-   end.
-
-(* 公式的仅由变元和常元组成的子项集 *)
-Fixpoint Formula_ST (t: Formula) : Ensemble term :=
-  match t with
-  | equality a b => (ST a) ∪ (ST b)
-  | atomic _ vr => (Vector_ST _ vr)
-  | Not a => (Formula_ST a)
-  | Contain a b => (Formula_ST a) ∪ (Formula_ST b)
-  | ForAll x a => [/(Tvar x)] ∪ (Formula_ST a)
-  end.
-
-(* 对子项集封闭的项集 *)
-Definition Closed_ST (ET : Ensemble term) := forall s, s ∈ ET -> (ST s) ⊆ ET.
-
-(* 公式的子公式集 *)
-Fixpoint Formula_SF (s: Formula) : Ensemble Formula :=
-  match s with
-  | equality a b => [/s]
-  | atomic _ _ => [/s]
-  | Not a => [/s] ∪ (Formula_SF a)
-  | Contain a b => [/s] ∪ (Formula_SF a) ∪ (Formula_SF b)
-  | ForAll x a => [/s] ∪ (Formula_SF a)
-  end.
-
-(* 对子公式封闭的公式集 *)
-Definition Closed_SF (S: Ensemble Formula) := forall s, s ∈ S 
-  -> (Formula_SF s) ⊆ S.
-
-(* 加强版排中律 *)
-Theorem classicT : forall P, {P} + {~ P}.
-Proof.
-  intros. assert { x: bool | if x then P else ~ P }.
-  { apply constructive_indefinite_description. destruct (classic P).
-    - exists true. auto.
-    - exists false. auto. }
-  destruct H, x; auto.
-Qed.
 
 (* 项t对p中变元x是自由的 *)
 Fixpoint t_x_free (p: Formula) (t: term) (x: Var) :=
