@@ -1,0 +1,22 @@
+# Coq build artifacts
+*.vo
+*.vio
+*.vos
+*.vok
+*.glob
+*.aux
+*.cache
+*.required_vo
+*.v.d
+*.v.beautified
+
+# Generated build files
+Makefile
+Makefile.conf
+
+# Native compilation cache
+.coq-native/
+
+# IDE / tooling
+.claude/
+*.log
