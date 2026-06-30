@@ -9,17 +9,14 @@
 
 (** formulas_K_System *)
 
-Require Import Base_ML.
+Require Export Base_ML.
 Require Export Coq.Arith.Arith.
 Require Export Coq.Vectors.Vector.
 Import VectorNotations.
 
-
 (* 一阶语言符号 *)
 (* 个体变元 *)
 Inductive Var : Set := X : nat -> Var.
-
-(* Variable Var : Type. *)
 
 (* 个体常元 *)
 Inductive Con : Set := C : nat -> Con.
@@ -223,10 +220,7 @@ Qed.
 
 Fact free_contain_Ens: forall (p: Formula), (Formula_free_Ens p) ⊆ (Formula_Ens p).
 Proof.
-  red. intros. induction p.
-  - auto.
-  - auto.
-  - apply IHp. auto.
+  red. intros. induction p; auto.
   - destruct H.
     + left. apply IHp1. auto.
     + right. apply IHp2. auto.
@@ -236,10 +230,7 @@ Qed.
 (* x不在公式中自由出现, 则t对公式p中的x是自由的 *)
 Fact free_test_2: forall x p t, ~ (x ∈ (Formula_Ens p)) -> t_x_free p t x = true.
 Proof.
-  intros; induction p; simpl.
-  - auto.
-  - auto.
-  - apply IHp. apply H.
+  intros; induction p; simpl; auto.
   - apply union_complement_equiv in H. destruct H.
     rewrite IHp1,IHp2; eauto.
   - destruct (classicT (x ∈ (Formula_free_Ens p) ~ [/v])).
@@ -253,10 +244,7 @@ Qed.
 (* 项x对公式p中的x是自由的 *)
 Fact free_test_3: forall x p, t_x_free p (Tvar x) x = true.
 Proof.
-  intros; induction p; simpl.
-  - auto.
-  - auto.
-  - auto.
+  intros; induction p; simpl; auto.
   - rewrite IHp1,IHp2. auto.
   - destruct (classicT (x ∈ (Formula_free_Ens p) ~ [/v])).
     destruct (classicT (v ∈ [/x])). destruct i0. destruct i.

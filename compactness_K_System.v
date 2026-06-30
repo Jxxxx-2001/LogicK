@@ -79,7 +79,7 @@ Proof.
     + unfold satisfyable_Γ in H0. destruct H0 as [MM [v ]]. red. exists MM, v.
       unfold satisfyable in *. intros. apply H0, H1. auto.
   - split; intros.
-    + apply satisfiable_contra_le in H0.
+    + apply exam_3_6_1 in H0.
       assert (~ finitely_satisfiable (Γ ∪ [/¬p])).
         { unfold not. intros. specialize (H (Γ ∪ [/¬p])). 
           destruct H. apply H in H1; auto. }
@@ -90,7 +90,7 @@ Proof.
       * unfold Included, Γ'. intros x [HxΓ0 HxΓ]. exact HxΓ.
       * eapply Finite_downward_closed. exact H3.
         unfold Included, Γ'. intros x [Hx _]. exact Hx.
-      * apply satisfiable_contra_le. unfold not. intros Hsat.
+      * apply exam_3_6_1. unfold not. intros Hsat.
         apply H1. eapply (satisfyable_subset _ (Γ' ∪ [/¬p])); eauto.
         unfold Included, Γ'. intros x Hx. specialize (H2 x Hx).
         destruct H2; [left; split | right]; auto.

@@ -35,23 +35,3 @@ Proof.
     - exists false. auto. }
   destruct H, x; auto.
 Qed.
-
-Lemma ex_not_not_all : forall (A : Type) (P : A -> Prop),
-  (exists x, P x) -> ~ (forall x, ~ P x).
-Proof.
-  intros A P [x Hx] H. apply (H x). exact Hx.
-Qed.
-
-Lemma not_all_not_ex : forall (A : Type) (P : A -> Prop),
-  ~ (forall x, ~ P x) -> exists x, P x.
-Proof.
-  intros A P H. apply NNPP. intro H'. apply H. intros x Hx.
-  apply H'. exists x. exact Hx.
-Qed.
-
-Lemma not_all_ex_not : forall (A : Type) (P : A -> Prop),
-  ~ (forall x, P x) -> exists x, ~ P x.
-Proof.
-  intros A P H. apply not_all_not_ex. intro H'. apply H.
-  intros x. apply NNPP. apply H'.
-Qed.

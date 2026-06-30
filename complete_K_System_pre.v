@@ -388,16 +388,31 @@ Qed.
 Lemma C_in_subst_term : forall t1 t2 x c_n, (C c_n) ∈ (term_C_set (t1 {x;t2}))
   -> (C c_n) ∈ (term_C_set t1) \/ (C c_n) ∈ (term_C_set t2).
 Proof.
-  fix IH 1. intros. destruct t1; simpl in H.
-  - destruct (eqbv x v) eqn : E; auto.
-  - inversion H. left. simpl. apply Single. auto.
-  - assert (H_vec : forall n v,
-      (C c_n) ∈ (Vector_C_set n (substitute_v n v t2 x)) 
-      -> (C c_n) ∈ (Vector_C_set n v) \/ (C c_n) ∈ (term_C_set t2)).
-      { induction v; intros; simpl in H0; auto. apply UnionI in H0 as [].
-        + apply IH in H0 as []; auto. left. simpl. left. auto.
-        + apply IHv in H0 as []; auto. left. simpl. right. auto. }
-    apply H_vec in H as []; auto.
+  intro t1. apply Term_ind_new with
+  (P := fun t1 => forall t2 x c_n, (C c_n) ∈ (term_C_set (t1 {x; t2}))
+     -> (C c_n) ∈ (term_C_set t1) \/ (C c_n) ∈ (term_C_set t2))
+  (P0 := fun n v => forall t2 x c_n,
+     (C c_n) ∈ (Vector_C_set n (substitute_v n v t2 x))
+     -> (C c_n) ∈ (Vector_C_set n v) \/ (C c_n) ∈ (term_C_set t2)).
+  - intros n t2 x c_n Hmem. simpl in Hmem.
+    destruct (eqbv x n) eqn:E.
+    + right. exact Hmem.
+    + inversion Hmem.
+  - intros n t2 x c_n Hmem. left. simpl. exact Hmem.
+  - apply (case0 (fun v =>
+      forall t2 x c_n, (C c_n) ∈ (Vector_C_set 0 (substitute_v 0 v t2 x))
+      -> (C c_n) ∈ (Vector_C_set 0 v) \/ (C c_n) ∈ (term_C_set t2))).
+    intros t2 x c_n Hmem. simpl in Hmem. inversion Hmem.
+  - intros f v Hv t2 x c_n Hmem. simpl in Hmem. simpl.
+    specialize (Hv t2 x c_n Hmem). exact Hv.
+  - intros n s t0 Hs Ht t2 x c_n Hmem. simpl in Hmem.
+    apply UnionI in Hmem as [Hhead | Htail].
+    + specialize (Hs t2 x c_n Hhead). destruct Hs as [Hs | Hs].
+      * left. simpl. left. exact Hs.
+      * right. exact Hs.
+    + specialize (Ht t2 x c_n Htail). destruct Ht as [Ht | Ht].
+      * left. simpl. right. exact Ht.
+      * right. exact Ht.
 Qed.
 
 Lemma C_in_subst : forall p t x c_n, (C c_n) ∈ (Formula_C_set (p {x;; t}))

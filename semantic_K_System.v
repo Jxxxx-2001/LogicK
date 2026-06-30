@@ -96,7 +96,8 @@ Lemma L_3_1_5 : forall MM v p x (m: M),
 Proof.
   intros. split; intros.
   - simpl in H. apply not_all_not_ex in H. destruct H. exists x0. auto.
-  - simpl. apply ex_not_not_all. exact H.
+  - simpl. apply ex_not_not_all. destruct H. exists x0.
+    intro. apply H0 in H. inversion H.
 Qed.
 
 (* ( MM, v ) |= Γ *)

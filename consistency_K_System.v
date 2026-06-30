@@ -16,8 +16,8 @@ Require Import syntax_K_System.
 Require Import semantic_K_System.
 
 (* 有矛盾公式集与一致集 *)
-Definition Contradiction Γ := exists q, Γ ├ q /\ Γ ├ ¬q.
-(* Locate Contradiciton. *)
+(* Definition Contradiction Γ := exists q, Γ ├ q /\ Γ ├ ¬q. *)
+(* Locate Contradiction. *)
 
 Definition consistence Γ := forall q, ~ (Γ ├ q /\ Γ ├ ¬q).
 

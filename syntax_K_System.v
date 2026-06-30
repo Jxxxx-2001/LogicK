@@ -27,7 +27,7 @@ Inductive Axiom_system : Formula -> Prop :=
   | E3 : forall t1 t2 t3, Axiom_system 
            ((equality t1 t2) → (equality t2 t3) → (equality t1 t3))
   | E4 : forall r v1 v2, Axiom_system 
-           (equality_4 (( atomic r v1) → (atomic r v2)) _ _ v1 v2)
+           (equality_4 ((atomic r v1) → (atomic r v2)) _ _ v1 v2)
   | E5 : forall f v1 v2, Axiom_system 
            (equality_4 (equality (Tfun f v1) (Tfun f v2)) _ _ v1 v2)
   | C1 : forall x p, ~(x ∈ (Formula_free_Ens p)) -> Axiom_system (p → (∀ x, p))
@@ -45,7 +45,6 @@ End Predicate_Calculus.
 Notation " ├ p " := (deduce_K (@ Φ) p) (at level 80).
 Notation " Γ ├ p " := (deduce_K Γ p) (at level 80).
 Global Hint Constructors Axiom_system deduce_K : KD.
-
 
 Fact Union_l : forall Γ p, Γ ├ p -> forall A, Γ ∪ A ├ p.
 Proof. intros. induction H; eauto with KD sets. Qed.
@@ -92,12 +91,10 @@ Ltac later :=
   | |- ?Γ ├ ?q → ?p => let H0 := fresh in assert (H0: Γ ├ p) by (autoK); autoK
   end.
 
-
 (* 同一律 |- p→q *)
 Proposition law_identity : forall Γ p, Γ ├ p → p.
 Proof. intros. assert(Γ ├ p → (p → p) → p) by autoK. autoK. Qed.
 Global Hint Resolve law_identity : KD.
-
 
 (* 演绎定理  *)
 Theorem Deductive_Theorem : forall Γ p q, Γ ∪ [p] ├ q <-> Γ ├ p → q.
@@ -130,7 +127,6 @@ Proof.
       apply H2. apply In_singleton. }
   pose proof (MP _ _ _ H2 H1). apply H3.
 Qed.
-
 
 (* 反证律 *)
 Theorem rule_Indirect : forall Γ p q, Γ ∪ [¬p] ├ q ->  Γ ∪ [¬p] ├ ¬q -> Γ ├ p.
@@ -171,7 +167,6 @@ Qed.
 
 Global Hint Resolve law_double_negation_second : KD.
 
-
 (* L3 |- (¬p → ¬q) → (q → p) *)
 Fact L3 : forall Γ p q, Γ ├ ((¬p → ¬q) → (q → p)).
 Proof.
@@ -179,7 +174,6 @@ Proof.
   apply rule_Indirect with q. eauto with *. apply MP with ¬p.
   eauto with *. eauto with *.
 Qed.
-
 
 (* 否定前件律 *)
 Proposition law_deny_antecedent : forall Γ p q, Γ ├ ¬q → (q → p).
@@ -197,11 +191,11 @@ Qed.
 
 Global Hint Resolve law_deny_antecedent : KD.
 
-Definition Contradiciton Γ := exists q, Γ ├ q /\ Γ ├ ¬q.
+Definition Contradiction Γ := exists q, Γ ├ q /\ Γ ├ ¬q.
 
-Definition No_Contradiciton Γ := forall q, ~ (Γ ├ q /\ Γ ├ ¬q).
+Definition No_Contradiction Γ := forall q, ~ (Γ ├ q /\ Γ ├ ¬q).
 
-Proposition prop_3_3 : forall Γ, Contradiciton Γ ->  forall p, Γ ├ p.
+Proposition prop_3_3 : forall Γ, Contradiction Γ ->  forall p, Γ ├ p.
 Proof. intros; destruct H, H; autoK. Qed.
 
 (* 否定肯定律 *)
@@ -409,7 +403,6 @@ Proof.
     assert (Γ ∪ [¬¬p → ¬q] ∪ [p] ├ ¬¬p). autoK. pose proof (MP _ _ _ H H0). auto.
 Qed.
 
-
 Proposition DeMorgan': forall p q Γ, Γ ├ ¬(p ∨ q) ↔ (¬p ∧ ¬q).
 Proof.
   intros. apply equivalent_theorem. split; repeat apply -> Deductive_Theorem.
@@ -424,7 +417,6 @@ Proof.
     assert (Γ ∪ [¬(¬p → ¬¬q)] ∪ [¬p → q] ├ ¬q ) by autoK.
     apply rule_Reduction_absurdity with q; auto.
 Qed.
-
 
 (* ================================================================ *)
 (* 与量词相关的一些命题 *)
@@ -458,7 +450,6 @@ Proof.
     apply MP with (∀ x, p); auto. apply MP with (∀ x, (p → q)); auto.
     apply K1. apply H0.
 Qed.
-
 
 (* 在项t中把变元x替换成自身Tvar x, 项不变 *)
 Fact subst_t_id : forall t x, substitute_t t (Tvar x) x = t.
@@ -571,12 +562,14 @@ Qed.
 Fact subst_term_ignore : forall t x s, ~ (x ∈ (term_Ens t))
   -> t{x;s} = t.
 Proof.
-  fix IH 1. intros. destruct t.
-  - simpl in H. simpl. destruct (eqbv x v) eqn:E; auto. Eqbv. elim H. ES.
-  - simpl. auto.
-  - simpl. f_equal. simpl in H. revert H. induction t; simpl; intros. auto.
-    f_equal. apply IH. intro. apply H. left. auto.
-    apply IHt. intro. apply H. right. auto.
+  intros t x s. apply Term_ind_new with
+  (P := fun t => ~ (x ∈ (term_Ens t)) -> t{x;s} = t)
+  (P0 := fun n v => ~ (x ∈ (Vector_Ens n v)) -> substitute_v n v s x = v);
+  intros; simpl in *; auto.
+  - destruct (eqbv x n) eqn:E; auto. Eqbv. elim H. ES.
+  - apply (case0 (fun v => substitute_v 0 v s x = v)); auto.
+  - f_equal. apply H; auto.
+  - apply union_complement_equiv in H1 as []. f_equal; auto.
 Qed.
 
 Fact subst_v_ignore : forall n v x s, ~ (x ∈ (Vector_Ens n v))
@@ -756,7 +749,6 @@ Proof.
   apply H5 in H4. apply H4. apply H3.
 Qed.
 
-
 Proposition prop_3_11: forall Γ p q x, Γ ∪ [p] ├ q 
   -> ~(x ∈ (Formula_free_Ens p)) -> ~(x ∈ (Formula_free_Ens q))
   ->  Γ ∪ [∃ x, p] ├ q.
@@ -860,6 +852,3 @@ Proof.
       apply equivalent_theorem. eauto. }
   unfold Exists. auto.
 Qed.
-
-
-

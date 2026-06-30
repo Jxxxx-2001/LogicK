@@ -38,28 +38,10 @@ Proof.
     + constructor. right. split.
 Qed.
 
-(* (Γ╞p)当且仅当Γ∪[/¬p]不是可满足的 *)
-Fact satisfiable_contra_le : forall Γ p, Γ ╞ p <-> ~ satisfyable_Γ (Γ ∪ [/¬p]).
-Proof.
-  intros. split; red; intros.
-  - red in H0. destruct H0 as [MM [v H0]]. 
-    assert(satisfyable MM v Γ). { red in H0. red. intros. apply H0. left. auto. } 
-    apply H in H1. pose proof H0. red in H0. specialize H0 with ¬p. 
-    assert(¬p ∈ (Γ ∪ [/¬p])). { right. eauto with sets. } 
-    apply H0 in H3. simpl in H3. auto.
-  - red in H. unfold satisfyable_Γ in H. unfold satisfyable in H0.
-    destruct(classic (p ∈ Γ) ). apply H0 in H1. auto.
-    destruct(classic (satisfy_R MM v p)). auto.
-    assert((exists (MM: Module) (v: value MM), satisfyable MM v (Γ ∪ [/¬p]))). 
-      { exists MM,v. red. intros. destruct H3. apply H0. auto. destruct H3. 
-        simpl; auto. }
-    apply H in H3. destruct H3.
-Qed.
-
 (* ~(Γ╞p)当且仅当Γ∪[/¬p]是可满足的*)
 Fact satisfiable_contra : forall Γ p, 
   ~ (Γ ╞ p) <-> satisfyable_Γ (Γ ∪ [/¬p]).
-Proof. intros; rewrite satisfiable_contra_le; tauto. Qed.
+Proof. intros; rewrite exam_3_6_1; tauto. Qed.
 
 (* 目标: 一致集都是可满足的 *)
 Definition consistence_satisfiable := forall Γ, consistence Γ -> satisfyable_Γ Γ.
