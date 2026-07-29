@@ -54,15 +54,15 @@ Proof.
   red in H; red in H0. simpl in H0.
   set(mm := (Build_Module nat (fun _ => 0) (fun _ _ => 0) (fun _ _ => True))).
   set(vv := (fun (_:Var) => 0)).
-  assert (satisfyable mm vv Φ). { red; intros. destruct H1. }
+  assert (satisfies mm vv Φ). { red; intros. destruct H1. }
   pose proof H mm vv H1. pose proof H0 mm vv H1. tauto.
 Qed.
 
-Corollary consistence_Γ :  forall Γ, satisfyable_Γ Γ -> consistence Γ.
+Corollary consistence_Γ :  forall Γ, satisfiable_Γ Γ -> consistence Γ.
 Proof.
   intros. unfold consistence. intros. intro. destruct H0. 
   apply soundness_K in H0, H1. red in H0, H1. simpl in H1.
-  unfold satisfyable_Γ in H. destruct H as [MM [v]]. pose proof H0 MM v H. 
+  unfold satisfiable_Γ in H. destruct H as [MM [v]]. pose proof H0 MM v H. 
   pose proof H1 MM v H. tauto.
 Qed.
 

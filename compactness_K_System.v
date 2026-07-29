@@ -35,7 +35,7 @@ Qed.
 
 (**************************************************************************)
 (* 一致集都是可满足的 *)
-(* Definition consistence_satisfiable := forall Γ, consistence Γ -> satisfyable_Γ Γ. *)
+(* Definition consistence_satisfiable := forall Γ, consistence Γ -> satisfiable_Γ Γ. *)
 Fact consistence_satisfiable : consistence_satisfiable. 
 Proof.
   red; intros. pose proof max_consistence_extension _ H as [Γ' [? []]].
@@ -44,15 +44,15 @@ Proof.
   pose proof model_sat Γ' H0 H2. red; intros. apply H1 in H4. apply H3; auto.
 Qed.
 
-Fact satisfyable_subset : forall Γ1 Γ2,
-  Γ1 ⊆ Γ2 -> satisfyable_Γ Γ2 -> satisfyable_Γ Γ1.
+Fact satisfiable_subset : forall Γ1 Γ2,
+  Γ1 ⊆ Γ2 -> satisfiable_Γ Γ2 -> satisfiable_Γ Γ1.
 Proof.
-  intros. unfold satisfyable_Γ, satisfyable in *. destruct H0 as [MM [v ?]].
+  intros. unfold satisfiable_Γ, satisfies in *. destruct H0 as [MM [v ?]].
   exists MM, v. intros. specialize (H0 p).
   unfold Included in H. apply H, H0 in H1. auto.
 Qed.
 
-Fact unsatisfyable : forall Γ p, Γ ╞ (p ∧ ¬p) <-> ~ satisfyable_Γ Γ.
+Fact unsatisfies : forall Γ p, Γ ╞ (p ∧ ¬p) <-> ~ satisfiable_Γ Γ.
 Proof.
   intros. split.
   - intros H1 H2. destruct H2 as [MM [v ?]]. specialize (H1 MM v H).
@@ -63,21 +63,21 @@ Qed.
 
 (* 有限可满足：Γ是有限可满足的当且仅当Γ的所有有限子集Γ0都是可满足的 *)
 Definition finitely_satisfiable Γ :=
-  forall Γ0, Γ0 ⊆ Γ /\ Finite _ Γ0 -> satisfyable_Γ Γ0.
+  forall Γ0, Γ0 ⊆ Γ /\ Finite _ Γ0 -> satisfiable_Γ Γ0.
 
 Corollary compactness_equiv : 
   (forall Γ p, Γ ╞ p <-> exists Γ', Γ' ⊆ Γ /\ Finite _ Γ' /\ Γ'╞ p)
-    <-> (forall Γ, finitely_satisfiable Γ <-> satisfyable_Γ Γ).
+    <-> (forall Γ, finitely_satisfiable Γ <-> satisfiable_Γ Γ).
 Proof.
   split; intros.
   - split; intros.
-    + destruct (classic (satisfyable_Γ Γ)) as [ ]; auto.
+    + destruct (classic (satisfiable_Γ Γ)) as [ ]; auto.
       apply consistence_satisfiable. red. intros. exfalso.
-      apply <- (unsatisfyable Γ q) in H1.
-      apply H in H1 as [Γ' [? []]]. apply unsatisfyable in H3.
+      apply <- (unsatisfies Γ q) in H1.
+      apply H in H1 as [Γ' [? []]]. apply unsatisfies in H3.
       unfold finitely_satisfiable in H0. specialize (H0 Γ'). auto.
-    + unfold satisfyable_Γ in H0. destruct H0 as [MM [v ]]. red. exists MM, v.
-      unfold satisfyable in *. intros. apply H0, H1. auto.
+    + unfold satisfiable_Γ in H0. destruct H0 as [MM [v ]]. red. exists MM, v.
+      unfold satisfies in *. intros. apply H0, H1. auto.
   - split; intros.
     + apply exam_3_6_1 in H0.
       assert (~ finitely_satisfiable (Γ ∪ [/¬p])).
@@ -91,7 +91,7 @@ Proof.
       * eapply Finite_downward_closed. exact H3.
         unfold Included, Γ'. intros x [Hx _]. exact Hx.
       * apply exam_3_6_1. unfold not. intros Hsat.
-        apply H1. eapply (satisfyable_subset _ (Γ' ∪ [/¬p])); eauto.
+        apply H1. eapply (satisfiable_subset _ (Γ' ∪ [/¬p])); eauto.
         unfold Included, Γ'. intros x Hx. specialize (H2 x Hx).
         destruct H2; [left; split | right]; auto.
     + destruct H0 as [Γ' [? []]]. apply soundness_K.

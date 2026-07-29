@@ -40,11 +40,11 @@ Qed.
 
 (* ~(Γ╞p)当且仅当Γ∪[/¬p]是可满足的*)
 Fact satisfiable_contra : forall Γ p, 
-  ~ (Γ ╞ p) <-> satisfyable_Γ (Γ ∪ [/¬p]).
+  ~ (Γ ╞ p) <-> satisfiable_Γ (Γ ∪ [/¬p]).
 Proof. intros; rewrite exam_3_6_1; tauto. Qed.
 
 (* 目标: 一致集都是可满足的 *)
-Definition consistence_satisfiable := forall Γ, consistence Γ -> satisfyable_Γ Γ.
+Definition consistence_satisfiable := forall Γ, consistence Γ -> satisfiable_Γ Γ.
 
 (* 若一致集都是可满足的, 那么完备性定理成立! *)
 Lemma complete_consistence_satisfiable : consistence_satisfiable -> complete.

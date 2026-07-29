@@ -778,7 +778,7 @@ Qed.
 
 (* 关键引理: Γ是可满足的当且仅当double_C_set Γ是可满足的 *)
 Lemma double_C_satisfiable : forall Γ,
-  satisfyable_Γ Γ <-> satisfyable_Γ (double_C_set Γ).
+  satisfiable_Γ Γ <-> satisfiable_Γ (double_C_set Γ).
 Proof.
   split; intros [MM [v H]]; red in H.
   - exists (ModulehalfC MM), v. red. intros p [p0 Hp0].

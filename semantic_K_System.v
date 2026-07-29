@@ -101,18 +101,18 @@ Proof.
 Qed.
 
 (* ( MM, v ) |= Γ *)
-Definition satisfyable MM v Γ := forall p, p ∈ Γ -> {MM; v} |= p.
+Definition satisfies MM v Γ := forall p, p ∈ Γ -> {MM; v} |= p.
 
 (* 可满足定义 *)
 (* p可满足 *)
-Definition satisfyable_Formula p := exists MM v, {MM; v} |= p.
+Definition satisfiable_Formula p := exists MM v, {MM; v} |= p.
 
 (* Γ可满足 *)
-Definition satisfyable_Γ Γ := exists MM v, satisfyable MM v Γ.
+Definition satisfiable_Γ Γ := exists MM v, satisfies MM v Γ.
 
 (* 逻辑蕴含 *)
 Definition Logically_implies Γ p := 
-  forall MM v, satisfyable MM v Γ -> {MM; v} |= p.
+  forall MM v, satisfies MM v Γ -> {MM; v} |= p.
 Notation "Γ ╞ p" := (Logically_implies Γ p) (at level 80).
 
 (* 逻辑等价 *)
@@ -135,7 +135,7 @@ Notation " ╞ p" := (valid_p p) (at level 80).
 Lemma valid_li_eq : forall p, Φ ╞ p <-> ╞ p.
 Proof.
   split; intros. red. red in H. intros.
-  assert (satisfyable MM v Φ). { red. intros. destruct H0. }
+  assert (satisfies MM v Φ). { red. intros. destruct H0. }
   apply H in H0. auto. red in H. red. intros. auto.
 Qed.
 
@@ -175,43 +175,43 @@ Check functional_extensionality_dep.
 (* forall f g : forall x : ?A, ?B x, (forall x : ?A, f x = g x) -> f = g *)
 
 (* P96 习题3.3.38 *)
-Example exam_3_6_1 : forall Γ p, Γ ╞ p <-> ~ satisfyable_Γ (Γ ∪ [/¬p]).
+Example exam_3_6_1 : forall Γ p, Γ ╞ p <-> ~ satisfiable_Γ (Γ ∪ [/¬p]).
 Proof.
   intros. split; red; intros.
   - red in H0. destruct H0 as [MM [v H0]].
-    assert (satisfyable MM v Γ). { red in H0. red. intros. apply H0. left. auto. } 
+    assert (satisfies MM v Γ). { red in H0. red. intros. apply H0. left. auto. } 
     apply H in H1. pose proof H0. red in H0. specialize H0 with ¬p. 
     assert (¬p ∈ (Γ ∪ [/¬p])). { right. eauto with sets. } 
     apply H0 in H3. simpl in H3. auto.
-  - red in H. unfold satisfyable_Γ in H. unfold satisfyable in H0.
+  - red in H. unfold satisfiable_Γ in H. unfold satisfies in H0.
     destruct (classicT (p ∈ Γ) ). apply H0 in i. auto.
     destruct (classicT (satisfy_R MM v p)). auto.
-    assert ((exists (MM: Module) (v: value MM), satisfyable MM v (Γ ∪ [/¬ p]))). 
+    assert ((exists (MM: Module) (v: value MM), satisfies MM v (Γ ∪ [/¬ p]))). 
       { exists MM,v. red. intros. destruct H1. apply H0. auto. apply Single in H1. 
         rewrite H1. apply n0. } 
     apply H in H1. destruct H1.
 Qed.
 
-Example exam_3_6_2 : forall Γ p, Γ ╞ ¬p <-> ~ satisfyable_Γ (Γ ∪ [/p]).
+Example exam_3_6_2 : forall Γ p, Γ ╞ ¬p <-> ~ satisfiable_Γ (Γ ∪ [/p]).
 Proof.
   intros. split; red; intros.
   - red in H0. destruct H0 as [MM [v H0]].
-    assert (satisfyable MM v Γ). 
+    assert (satisfies MM v Γ). 
       { red in H0. red. intros. apply H0. left. auto. } 
     apply H in H1. pose proof H0. red in H0. specialize H0 with p. 
     assert( p ∈ (Γ ∪ [/p])). { right. eauto with sets. } 
     apply H0 in H3. simpl in H1. auto.
-  - red in H. unfold satisfyable_Γ in H. unfold satisfyable in H0.
+  - red in H. unfold satisfiable_Γ in H. unfold satisfies in H0.
     destruct (classicT (¬p ∈ Γ) ). apply H0 in i. auto.
     destruct (classicT ( satisfy_R MM v ¬p)). auto.
-    assert ((exists (MM : Module) (v : value MM), satisfyable MM v (Γ ∪ [/p]))). 
+    assert ((exists (MM : Module) (v : value MM), satisfies MM v (Γ ∪ [/p]))). 
       { exists MM,v. red. intros. destruct H1. apply H0. auto. apply Single in H1.
         rewrite H1. simpl in n0. tauto. }
     apply H in H1. destruct H1.
 Qed.
 
-Example exam_3_6_3 : forall Γ p, satisfyable_Γ Γ 
-  -> satisfyable_Γ (Γ ∪ [/¬p]) \/ satisfyable_Γ (Γ ∪ [/p]).
+Example exam_3_6_3 : forall Γ p, satisfiable_Γ Γ 
+  -> satisfiable_Γ (Γ ∪ [/¬p]) \/ satisfiable_Γ (Γ ∪ [/p]).
 Proof.
   intros. destruct (classicT (p ∈ Γ) ); red in H; destruct H as [M [v H0]].
   - right. red. exists M,v. red. intros. destruct H. apply H0. auto. 

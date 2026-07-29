@@ -560,11 +560,8 @@ Proof.
   intro p. apply model_sat_complexity with (n := formula_rank p). lia.
 Qed.
 
-(* 可满足的: 若存在模型(MM,v)使得{MM; v} |= p 对每个 p∈Γ 都成立*)
-Definition satisfiable Γ := exists MM v, satisfyable MM v Γ.
-
-(* 可满足定理 *)
-Theorem satisfiable_theorem : satisfiable Γ.
+(* 可满足定理: 复用 semantic_K_System 中的 satisfiable_Γ, 不再重复定义 *)
+Theorem satisfiable_theorem : satisfiable_Γ Γ.
 Proof. intros. red. exists D_I. exists assignment. red. apply model_sat. Qed.
 
 End model_existence_proof.
