@@ -25,8 +25,8 @@ Import VectorNotations.
 (* 亨金证据 *)
 (* 见证性Witness Property: Γ是一致集, 对任意p, 变元x, 若(¬(Forall x p)) ∈ Γ, 
    则存在c∈Con, 使得 ¬(p(c/x))∈Γ *)
-Definition witness_property Γ := forall p x, (¬(∀ x, p)) ∈ Γ
-  -> exists c, (¬(substitute_f p (Tcon c) x)) ∈ Γ.
+Definition witness_property Γ := forall p x, (Not (ForAll x p)) ∈ Γ
+  -> exists c, (Not (substitute_f p (Tcon c) x)) ∈ Γ.
 
 (***************************************************************************)
 (*                           变元操作                                       *)
