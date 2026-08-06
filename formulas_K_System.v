@@ -54,12 +54,12 @@ Inductive Formula :=
   | equality : term -> term -> Formula
   | atomic : forall (r: Rel), Vector.t (term) (arity_R r) -> Formula
   | Not : Formula -> Formula
-  | Contain : Formula -> Formula -> Formula 
+  | Imply : Formula -> Formula -> Formula 
   | ForAll : Var -> Formula -> Formula.
 
 Notation "t1 ≃ t2" := (equality t1 t2)(at level 5, right associativity).
 Notation "¬ q" := (Not q)(at level 5, right associativity).
-Notation "p → q" := (Contain p q)(at level 11, right associativity).
+Notation "p → q" := (Imply p q)(at level 11, right associativity).
 Notation "∀ x , p" := (ForAll x p) (at level 7, right associativity).
 
 Definition Φ := @ Empty_set Formula.
@@ -80,11 +80,11 @@ Ltac ES :=
 (* 其他符号 *)
 Definition Inequality t1 t2 := Not (equality t1 t2). 
 
-Definition Disjunction p q := Contain (Not p) q.
+Definition Disjunction p q := Imply (Not p) q.
 
-Definition Conjunction p q := Not (Contain p (Not q)).
+Definition Conjunction p q := Not (Imply p (Not q)).
 
-Definition Equivalent p q := Conjunction (Contain p q) (Contain q p).
+Definition Equivalent p q := Conjunction (Imply p q) (Imply q p).
 
 Definition Exists x p := Not (ForAll x (Not p)).
 
@@ -130,7 +130,7 @@ Fixpoint Formula_Ens (p: Formula) :=
   | equality t1 t2 => (term_Ens t1) ∪ (term_Ens t2)
   | atomic _ q => Vector_Ens _ q
   | Not q => Formula_Ens q
-  | Contain m n =>  (Formula_Ens m) ∪ (Formula_Ens n)
+  | Imply m n =>  (Formula_Ens m) ∪ (Formula_Ens n)
   | ForAll x q => (Formula_Ens q) ∪ [/x]
   end.
 
@@ -159,7 +159,7 @@ Fixpoint Formula_C_set (p: Formula) :=
   | equality t1 t2 => (term_C_set t1) ∪ (term_C_set t2)
   | atomic _ q => Vector_C_set _ q
   | Not q => Formula_C_set q
-  | Contain m n =>  (Formula_C_set m) ∪ (Formula_C_set n)
+  | Imply m n =>  (Formula_C_set m) ∪ (Formula_C_set n)
   | ForAll x q => (Formula_C_set q) 
   end.
 
@@ -169,7 +169,7 @@ Fixpoint Formula_free_Ens (p: Formula) :=
   | equality t1 t2 => (term_Ens t1) ∪ (term_Ens t2)
   | atomic _ q => Vector_Ens _ q
   | Not q => Formula_free_Ens q
-  | Contain m n => (Formula_free_Ens m) ∪ (Formula_free_Ens n)
+  | Imply m n => (Formula_free_Ens m) ∪ (Formula_free_Ens n)
   | ForAll x q => (Formula_free_Ens q) ~ [/x]
   end.
 
@@ -185,7 +185,7 @@ Fixpoint t_x_free (p: Formula) (t: term) (x: Var) :=
   | equality t1 t2 => true
   | atomic _ q => true 
   | Not q => t_x_free q t x
-  | Contain m n => andb (t_x_free m t x) (t_x_free n t x)
+  | Imply m n => andb (t_x_free m t x) (t_x_free n t x)
   | ForAll y q => match (classicT (x ∈ (Formula_free_Ens p))) with
                   | left _ => match (classicT (y ∈ (term_Ens t))) with
                               | left _ => false
@@ -291,7 +291,7 @@ Fixpoint substitute_f (p: Formula) (t': term) (x: Var) :=
   | equality t1 t2 => equality (substitute_t t1 t' x) (substitute_t t2 t' x) 
   | atomic _ q => atomic _ (substitute_v _ q t' x) 
   | Not q => Not (substitute_f q t' x)
-  | Contain m n => Contain (substitute_f m t' x) (substitute_f n t' x)
+  | Imply m n => Imply (substitute_f m t' x) (substitute_f n t' x)
   | ForAll y q => if (eqbv x y) then ForAll y q
                     else ForAll y (substitute_f q t' x)
   end.

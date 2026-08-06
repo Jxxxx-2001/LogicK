@@ -210,7 +210,7 @@ Fixpoint formula_rank (p : Formula) : nat :=
   | equality _ _ => 0
   | atomic _ _ => 0
   | Not q => S (formula_rank q)
-  | Contain q r => S (max (formula_rank q) (formula_rank r))
+  | Imply q r => S (max (formula_rank q) (formula_rank r))
   | ForAll _ q => S (formula_rank q)
   end.
 
@@ -235,12 +235,12 @@ Fact rank_Sn_to_n_Not : forall q n,
   formula_rank (Not q) <= S n -> formula_rank q <= n.
 Proof. simpl; intros; lia. Qed.
 
-Fact rank_Sn_to_n_Contain_l : forall q r n, 
-  formula_rank (Contain q r) <= S n -> formula_rank q <= n.
+Fact rank_Sn_to_n_Imply_l : forall q r n, 
+  formula_rank (Imply q r) <= S n -> formula_rank q <= n.
 Proof. simpl; intros; lia. Qed.
 
-Fact rank_Sn_to_n_Contain_r : forall q r n, 
-  formula_rank (Contain q r) <= S n -> formula_rank r <= n.
+Fact rank_Sn_to_n_Imply_r : forall q r n, 
+  formula_rank (Imply q r) <= S n -> formula_rank r <= n.
 Proof. simpl; intros; lia. Qed.
 
 Fact rank_Sn_to_n_ForAll : forall v q n, 
@@ -263,9 +263,9 @@ Proof.
                                                (atomic r args) (Nat.le_refl 0))
         | exist _ (Not q) Hr => 
             inr (inl (inl (exist _ q (rank_Sn_to_n_Not _ _ Hr))))
-        | exist _ (Contain q r) Hr =>
-            inr (inl (inr (exist _ q (rank_Sn_to_n_Contain_l _ _ _ Hr), 
-                           exist _ r (rank_Sn_to_n_Contain_r _ _ _ Hr))))
+        | exist _ (Imply q r) Hr =>
+            inr (inl (inr (exist _ q (rank_Sn_to_n_Imply_l _ _ _ Hr), 
+                           exist _ r (rank_Sn_to_n_Imply_r _ _ _ Hr))))
         | exist _ (ForAll v q) Hr =>
             inr (inr (v, exist _ q (rank_Sn_to_n_ForAll _ _ _ Hr)))
         end)).

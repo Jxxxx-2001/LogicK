@@ -54,7 +54,7 @@ Fixpoint satisfy_R MM (v: value MM) (p: Formula) : Prop :=
    | equality t1 t2 => v// t1 = v// t2
    | atomic r v1 => I_R r (Vector.map (v//) v1)
    | Not q => ~ satisfy_R MM v q
-   | Contain q r => (~ satisfy_R MM v q) \/ (satisfy_R MM v r)
+   | Imply q r => (~ satisfy_R MM v q) \/ (satisfy_R MM v r)
    | ForAll x q => forall (m: M), satisfy_R MM (value_v v x m) q 
   end.
 Notation " { MM ; v } |= p" :=(satisfy_R MM v p )(at level 0). 

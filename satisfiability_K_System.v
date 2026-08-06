@@ -461,7 +461,7 @@ Fixpoint formula_rank (p: Formula) : nat :=
   | equality _ _ => 0
   | atomic _ _ => 0
   | Not q => S (formula_rank q)
-  | Contain q r => S (max (formula_rank q) (formula_rank r))
+  | Imply q r => S (max (formula_rank q) (formula_rank r))
   | ForAll _ q => S (formula_rank q)
   end. *)
 
@@ -493,7 +493,7 @@ Proof.
     + apply model_satisfiable_le2.
     + (* Not case *)
       apply model_satisfiable_le3. apply IHn. simpl in Hcomp. lia.
-    + (* Contain case - 对应 Conjunction *)
+    + (* Imply case - 对应 Conjunction *)
       apply model_satisfiable_le4.
       * apply IHn. simpl in Hcomp. lia.
       * apply IHn. simpl in Hcomp. lia.

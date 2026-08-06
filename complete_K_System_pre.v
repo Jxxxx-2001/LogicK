@@ -60,7 +60,7 @@ Fixpoint max_v_formula p :=
                   | h :: q' => max (max_v_term h) (max_v_vc _ q') 
                   end in max_v_vc _ q
   | Not q => max_v_formula q
-  | Contain m n => max (max_v_formula m) (max_v_formula n)
+  | Imply m n => max (max_v_formula m) (max_v_formula n)
   | ForAll (X x) q => max x (max_v_formula q)
   end.
 
@@ -144,7 +144,7 @@ Fixpoint max_c_formula p :=
   | equality t1 t2 => max (max_c_term t1) (max_c_term t2)
   | atomic _ q => max_c_vc _ q
   | Not q => max_c_formula q
-  | Contain m n => max (max_c_formula m) (max_c_formula n)
+  | Imply m n => max (max_c_formula m) (max_c_formula n)
   | ForAll x q => max_c_formula q
   end.
 
@@ -161,7 +161,7 @@ Fixpoint substitute_fc (p : Formula) (t' : term) (c : Con) :=
   | equality t1 t2 => equality (substitute_tc t1 t' c) (substitute_tc t2 t' c) 
   | atomic _ q => atomic _ (substitute_vc _ q t' c) 
   | Not q => Not (substitute_fc q t' c)
-  | Contain m n => Contain (substitute_fc m t' c) (substitute_fc n t' c)
+  | Imply m n => Imply (substitute_fc m t' c) (substitute_fc n t' c)
   | ForAll y q => ForAll y (substitute_fc q t' c)
   end.
 Notation " p {/ c ;; r } ":= (substitute_fc p r c)(at level 0).
@@ -497,7 +497,7 @@ Fixpoint map_C_formula (p : Formula) : Formula :=
   | equality t1 t2 => equality (map_C_term t1) (map_C_term t2)
   | atomic r q => atomic r (map_C_vector _ q)
   | Not q => Not (map_C_formula q)
-  | Contain m n => Contain (map_C_formula m) (map_C_formula n)
+  | Imply m n => Imply (map_C_formula m) (map_C_formula n)
   | ForAll x q => ForAll x (map_C_formula q)
   end.
 
