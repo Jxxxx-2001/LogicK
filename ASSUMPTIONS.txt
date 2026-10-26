@@ -1,0 +1,18 @@
+Verified with Coq 8.13.2 on 2026-10-26.
+Command: Print Assumptions Godel_complete_theorem.
+
+Axioms:
+FunctionalExtensionality.functional_extensionality_dep
+  : forall (A : Type) (B : A -> Type) (f g : forall x : A, B x),
+    (forall x : A, f x = g x) -> f = g
+Eqdep.Eq_rect_eq.eq_rect_eq
+  : forall (U : Type) (p : U) (Q : U -> Type) (x : Q p) (h : p = p),
+    x = eq_rect p Q x p h
+Epsilon.epsilon_statement
+  : forall (A : Type) (P : A -> Prop),
+    inhabited A -> {x : A | (exists x0 : A, P x0) -> P x}
+Classical_Prop.classic : forall P : Prop, P \/ ~ P
+JMeq.JMeq_eq : forall (A : Type) (x y : A), JMeq.JMeq x y -> x = y
+Ensembles.Extensionality_Ensembles
+  : forall (U : Type) (A B : Ensembles.Ensemble U),
+    Ensembles.Same_set U A B -> A = B
